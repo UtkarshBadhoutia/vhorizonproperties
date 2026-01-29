@@ -1,0 +1,196 @@
+@import url('https://fonts.googleapis.com/css2?family=Montserrat:wght@300;400;500;600;700&family=Playfair+Display:ital,wght@0,400;0,500;0,600;0,700;1,400&display=swap');
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  :root {
+    /* Aurum Estates Brand Colors */
+    --gold: 42 61% 54%;
+    --gold-light: 42 61% 64%;
+    --gold-dark: 42 61% 44%;
+    --charcoal: 0 0% 7%;
+    --charcoal-light: 0 0% 17%;
+    --ivory: 40 33% 97%;
+    
+    /* Semantic Colors */
+    --background: 40 33% 97%;
+    --foreground: 0 0% 20%;
+
+    --card: 0 0% 100%;
+    --card-foreground: 0 0% 20%;
+
+    --popover: 0 0% 100%;
+    --popover-foreground: 0 0% 20%;
+
+    --primary: 42 61% 54%;
+    --primary-foreground: 0 0% 100%;
+
+    --secondary: 0 0% 7%;
+    --secondary-foreground: 0 0% 100%;
+
+    --muted: 40 20% 92%;
+    --muted-foreground: 0 0% 45%;
+
+    --accent: 42 61% 94%;
+    --accent-foreground: 42 61% 40%;
+
+    --destructive: 0 84% 60%;
+    --destructive-foreground: 0 0% 100%;
+
+    --success: 145 63% 42%;
+    --success-foreground: 0 0% 100%;
+
+    --border: 40 20% 88%;
+    --input: 40 20% 88%;
+    --ring: 42 61% 54%;
+
+    --radius: 0.75rem;
+
+    /* Shadows */
+    --shadow-card: 0 10px 30px hsla(0, 0%, 0%, 0.08);
+    --shadow-float: 0 20px 40px hsla(0, 0%, 0%, 0.15);
+    --shadow-glow: 0 0 40px hsla(42, 61%, 54%, 0.3);
+
+    /* Fonts */
+    --font-sans: 'Montserrat', sans-serif;
+    --font-serif: 'Playfair Display', serif;
+
+    /* Header */
+    --header-height: 80px;
+  }
+
+  .dark {
+    --background: 0 0% 7%;
+    --foreground: 40 33% 97%;
+
+    --card: 0 0% 12%;
+    --card-foreground: 40 33% 97%;
+
+    --popover: 0 0% 12%;
+    --popover-foreground: 40 33% 97%;
+
+    --primary: 42 61% 54%;
+    --primary-foreground: 0 0% 100%;
+
+    --secondary: 0 0% 17%;
+    --secondary-foreground: 40 33% 97%;
+
+    --muted: 0 0% 17%;
+    --muted-foreground: 0 0% 65%;
+
+    --accent: 42 61% 20%;
+    --accent-foreground: 42 61% 70%;
+
+    --destructive: 0 62% 30%;
+    --destructive-foreground: 0 0% 100%;
+
+    --border: 0 0% 20%;
+    --input: 0 0% 20%;
+    --ring: 42 61% 54%;
+  }
+}
+
+@layer base {
+  * {
+    @apply border-border;
+  }
+
+  html {
+    scroll-behavior: smooth;
+  }
+
+  body {
+    @apply bg-background text-foreground;
+    font-family: var(--font-sans);
+  }
+
+  h1, h2, h3, h4, h5, h6 {
+    font-family: var(--font-sans);
+  }
+
+  .font-serif {
+    font-family: var(--font-serif);
+  }
+}
+
+@layer components {
+  .text-gold {
+    @apply text-primary;
+  }
+
+  .bg-charcoal {
+    background-color: hsl(var(--charcoal));
+  }
+
+  .bg-ivory {
+    background-color: hsl(var(--ivory));
+  }
+
+  /* Property Card Styles */
+  .property-card {
+    @apply bg-card rounded-xl overflow-hidden transition-all duration-300;
+    box-shadow: var(--shadow-card);
+  }
+
+  .property-card:hover {
+    transform: translateY(-5px);
+    box-shadow: var(--shadow-float);
+  }
+
+  /* Skeleton Loader */
+  .skeleton {
+    @apply bg-muted rounded;
+    background: linear-gradient(
+      90deg,
+      hsl(var(--muted)) 25%,
+      hsl(var(--border)) 50%,
+      hsl(var(--muted)) 75%
+    );
+    background-size: 200% 100%;
+    animation: shimmer 1.5s infinite;
+  }
+
+  @keyframes shimmer {
+    0% { background-position: 200% 0; }
+    100% { background-position: -200% 0; }
+  }
+
+  /* Custom scrollbar */
+  .custom-scrollbar::-webkit-scrollbar {
+    width: 6px;
+  }
+
+  .custom-scrollbar::-webkit-scrollbar-track {
+    @apply bg-muted rounded;
+  }
+
+  .custom-scrollbar::-webkit-scrollbar-thumb {
+    @apply bg-primary/30 rounded;
+  }
+
+  .custom-scrollbar::-webkit-scrollbar-thumb:hover {
+    @apply bg-primary/50;
+  }
+}
+
+@layer utilities {
+  .text-balance {
+    text-wrap: balance;
+  }
+
+  .gradient-overlay {
+    background: linear-gradient(180deg, hsla(0, 0%, 0%, 0.3) 0%, hsla(0, 0%, 0%, 0.7) 100%);
+  }
+
+  .glass {
+    background: hsla(0, 0%, 100%, 0.15);
+    backdrop-filter: blur(12px);
+    border: 1px solid hsla(0, 0%, 100%, 0.2);
+  }
+
+  .container-padding {
+    @apply px-4 sm:px-6 lg:px-8;
+  }
+}
