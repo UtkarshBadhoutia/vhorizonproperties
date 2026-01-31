@@ -10,6 +10,7 @@ import { useProperties } from "@/hooks/useProperties";
 
 const features = [
   "Off-Market Listings",
+  "Property Sales & Leasing",
   "Legal & Tax Advisory",
   "Interior Design Concierge",
   "Property Management",
@@ -24,22 +25,22 @@ export default function Index() {
   return (
     <Layout>
       <Helmet>
-        <title>V Horizon Properties | Buy Studio Apartments & Luxury Stays</title>
-        <meta name="description" content="Find your dream property with V Horizon Properties. We specialize in luxury stays, studio apartments, and premium real estate in Delhi, Ghaziabad, Noida, and Gurugram." />
+        <title>V Horizon Properties | Buy, Sell, Lease Real Estate & Luxury Stays</title>
+        <meta name="description" content="Your premier destination for buying, selling, and leasing real estate. Explore luxury studio apartments and short-term stays in Delhi NCR." />
         <link rel="canonical" href="https://vhorizonproperties.in/" />
       </Helmet>
       {/* Hero Section with Carousel */}
       <HeroCarousel>
         <div className="container text-center text-white px-4 sm:px-6">
           <p className="text-xs sm:text-sm lg:text-base uppercase tracking-[0.2em] sm:tracking-[0.3em] text-primary mb-3 sm:mb-4 animate-fade-in">
-            Premium Real Estate & Stays
+            Buy, Sell, Lease & Stay
           </p>
           <h1 className="text-3xl sm:text-4xl md:text-5xl lg:text-7xl font-bold mb-4 sm:mb-6 animate-fade-in" style={{ animationDelay: "100ms" }}>
             Architecture as{" "}
             <span className="font-serif italic text-primary">Art.</span>
           </h1>
           <p className="text-sm sm:text-lg lg:text-xl text-white/80 mb-6 sm:mb-10 max-w-2xl mx-auto animate-fade-in px-2" style={{ animationDelay: "200ms" }}>
-            Curating exceptional properties, including luxury studio apartments and stays, in Delhi NCR.
+            Curating exceptional properties for buying, selling, and leasing, including luxury studio apartments and stays in Delhi NCR.
           </p>
 
           <div className="inline-flex flex-col sm:flex-row gap-2 sm:gap-3 p-2 sm:p-3 rounded-2xl sm:rounded-full bg-white/10 backdrop-blur-md border border-white/20 animate-fade-in" style={{ animationDelay: "300ms" }}>
@@ -106,7 +107,7 @@ export default function Index() {
                 Why <span className="text-primary">V Horizon?</span>
               </h2>
               <p className="text-muted-foreground mb-6 sm:mb-8 text-sm sm:text-base">
-                We don't just sell homes; we curate lifestyles. Our private office provides discreet, high-touch advisory services for India's Ultra-HNI community.
+                We don't just transact properties; we curate lifestyles. Whether you're buying, selling, or leasing, our private office provides discreet, high-touch advisory services.
               </p>
 
               <ul className="space-y-3 sm:space-y-4">
@@ -127,9 +128,9 @@ export default function Index() {
 
             <div className="relative mt-8 lg:mt-0">
               <img
-                src="https://images.unsplash.com/photo-1556912172-45b7abe8d7e1?q=80&w=800"
+                src="/luxury-interior.png"
                 alt="Luxury Interior"
-                className="rounded-xl shadow-float w-full"
+                className="rounded-xl shadow-float w-full h-[300px] sm:h-[400px] object-cover"
               />
               <div className="absolute -bottom-4 -left-4 sm:-bottom-6 sm:-left-6 bg-card p-4 sm:p-6 rounded-xl shadow-card hidden sm:block">
                 <p className="text-2xl sm:text-3xl font-bold text-primary">10+</p>
