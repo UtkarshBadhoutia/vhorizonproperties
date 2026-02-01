@@ -8,6 +8,7 @@ import { Loader2 } from "lucide-react";
 import ScrollToTop from "@/components/ScrollToTop";
 import { AuthProvider } from "@/contexts/AuthContext";
 import { AuthGate } from "@/components/AuthGate";
+import { GlobalErrorBoundary } from "@/components/GlobalErrorBoundary";
 
 // Eager load critical pages
 import Index from "./pages/Index";
@@ -49,28 +50,30 @@ const App = () => (
   <QueryClientProvider client={queryClient}>
     <TooltipProvider>
       <AuthProvider queryClient={queryClient}>
-        <AuthGate>
-          <Toaster />
-          <Sonner />
-          <BrowserRouter>
-            <ScrollToTop />
-            <Suspense fallback={<PageLoader />}>
-              <Routes>
-                <Route path="/" element={<Index />} />
-                <Route path="/buy" element={<ListingsPage key="buy" defaultStatus="sale" />} />
-                <Route path="/rent" element={<ListingsPage key="rent" defaultStatus="rent" />} />
-                <Route path="/stays" element={<StaysPage />} />
-                <Route path="/property/:id" element={<PropertyDetailPage />} />
-                <Route path="/team" element={<TeamPage />} />
-                <Route path="/compare" element={<ComparePage />} />
-                <Route path="/login" element={<LoginPage />} />
-                <Route path="/dashboard" element={<DashboardPage />} />
-                <Route path="/admin" element={<AdminPage />} />
-                <Route path="*" element={<NotFound />} />
-              </Routes>
-            </Suspense>
-          </BrowserRouter>
-        </AuthGate>
+        <GlobalErrorBoundary>
+          <AuthGate>
+            <Toaster />
+            <Sonner />
+            <BrowserRouter>
+              <ScrollToTop />
+              <Suspense fallback={<PageLoader />}>
+                <Routes>
+                  <Route path="/" element={<Index />} />
+                  <Route path="/buy" element={<ListingsPage key="buy" defaultStatus="sale" />} />
+                  <Route path="/rent" element={<ListingsPage key="rent" defaultStatus="rent" />} />
+                  <Route path="/stays" element={<StaysPage />} />
+                  <Route path="/property/:id" element={<PropertyDetailPage />} />
+                  <Route path="/team" element={<TeamPage />} />
+                  <Route path="/compare" element={<ComparePage />} />
+                  <Route path="/login" element={<LoginPage />} />
+                  <Route path="/dashboard" element={<DashboardPage />} />
+                  <Route path="/admin" element={<AdminPage />} />
+                  <Route path="*" element={<NotFound />} />
+                </Routes>
+              </Suspense>
+            </BrowserRouter>
+          </AuthGate>
+        </GlobalErrorBoundary>
       </AuthProvider>
     </TooltipProvider>
   </QueryClientProvider>

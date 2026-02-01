@@ -29,9 +29,9 @@ export function AuthProvider({ children, queryClient }: AuthProviderProps) {
     const [loading, setLoading] = useState(true);
     const [isAdmin, setIsAdmin] = useState(false);
 
+
     useEffect(() => {
         let mounted = true;
-        let resolved = false;
 
         const checkAdminRole = async (userId: string) => {
             try {
@@ -40,10 +40,16 @@ export function AuthProvider({ children, queryClient }: AuthProviderProps) {
                     .select("role")
                     .eq("user_id", userId)
                     .eq("role", "admin")
-                    .maybeSingle(); // Use maybeSingle to avoid 406 error if no rows found
+                    .maybeSingle();
 
                 if (!mounted) return;
-                setIsAdmin(!!data);
+
+                if (error) {
+                    console.error("Error checking admin role:", error);
+                    setIsAdmin(false);
+                } else {
+                    setIsAdmin(!!data);
+                }
             } catch (err) {
                 console.error("Error checking admin role:", err);
                 if (mounted) setIsAdmin(false);
@@ -66,21 +72,11 @@ export function AuthProvider({ children, queryClient }: AuthProviderProps) {
             } finally {
                 if (mounted) {
                     setLoading(false);
-                    resolved = true;
                 }
             }
         };
 
         initSession();
-
-        // Safety timeout to prevent infinite loading
-        const safetyTimeout = setTimeout(() => {
-            if (mounted && !resolved) {
-                console.warn("Auth check timed out, forcing loading false");
-                setLoading(false);
-                resolved = true;
-            }
-        }, 3000);
 
         const { data: { subscription } } = supabase.auth.onAuthStateChange(
             async (event, session) => {
@@ -88,28 +84,32 @@ export function AuthProvider({ children, queryClient }: AuthProviderProps) {
 
                 setUser(session?.user ?? null);
                 if (session?.user) {
+                    // Check admin role again on auth state change (like sign in)
                     await checkAdminRole(session.user.id);
                 } else {
                     setIsAdmin(false);
                 }
                 setLoading(false);
-                resolved = true;
             }
         );
 
         return () => {
             mounted = false;
-            clearTimeout(safetyTimeout);
             subscription.unsubscribe();
         };
     }, []);
 
     const signOut = async () => {
-        await supabase.auth.signOut();
-        setUser(null);
-        setIsAdmin(false);
-        // Clear all React Query cache to prevent stale data from persisting
-        queryClient.clear();
+        try {
+            await supabase.auth.signOut();
+        } catch (error) {
+            console.error("Error signing out:", error);
+        } finally {
+            setUser(null);
+            setIsAdmin(false);
+            // Clear all React Query cache to prevent stale data from persisting
+            queryClient.clear();
+        }
     };
 
     return (

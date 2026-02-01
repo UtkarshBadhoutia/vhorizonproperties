@@ -1,5 +1,6 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
+import { useAuth } from "@/hooks/useAuth";
 import { Eye, EyeOff, Loader2 } from "lucide-react";
 import Layout from "@/components/Layout";
 import { Button } from "@/components/ui/button";
@@ -10,12 +11,25 @@ import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 
 export default function LoginPage() {
+  /* eslint-disable react-hooks/exhaustive-deps */
   const navigate = useNavigate();
+  const { user, isAdmin, loading: authLoading } = useAuth();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [showPassword, setShowPassword] = useState(false);
   const [loading, setLoading] = useState(false);
   const [isSignUp, setIsSignUp] = useState(false);
+
+  // Redirect if already logged in
+  useEffect(() => {
+    if (!authLoading && user) {
+      if (isAdmin) {
+        navigate("/admin");
+      } else {
+        navigate("/dashboard");
+      }
+    }
+  }, [user, isAdmin, authLoading, navigate]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -36,20 +50,8 @@ export default function LoginPage() {
           password,
         });
         if (error) throw error;
-        // Check role and redirect
-        const { data: roleData } = await supabase
-          .from("user_roles")
-          .select("role")
-          .eq("user_id", (await supabase.auth.getUser()).data.user?.id)
-          .eq("role", "admin")
-          .maybeSingle();
-
+        // Navigation will be handled by the useEffect above once auth state updates
         toast.success("Signed in successfully!");
-        if (roleData) {
-          navigate("/admin");
-        } else {
-          navigate("/dashboard");
-        }
       }
     } catch (err: unknown) {
       const errorMessage = err instanceof Error ? err.message : "Authentication failed";
