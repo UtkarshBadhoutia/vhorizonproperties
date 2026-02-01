@@ -88,7 +88,7 @@ export default function AdminPage() {
       if (error) throw error;
       return data as Lead[];
     },
-    enabled: !!user && isAdmin,
+    enabled: !!user && isAdmin && !authLoading,
   });
 
   const updateLeadMutation = useMutation({

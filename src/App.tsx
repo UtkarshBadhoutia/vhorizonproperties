@@ -22,7 +22,19 @@ const DashboardPage = lazy(() => import("./pages/DashboardPage"));
 const StaysPage = lazy(() => import("./pages/StaysPage"));
 const NotFound = lazy(() => import("./pages/NotFound"));
 
-const queryClient = new QueryClient();
+const queryClient = new QueryClient({
+  defaultOptions: {
+    queries: {
+      retry: (failureCount, error) => {
+        // Retry up to 2 times for network errors during auth restoration
+        if (failureCount < 2) return true;
+        return false;
+      },
+      retryDelay: (attemptIndex) => Math.min(1000 * 2 ** attemptIndex, 3000),
+      refetchOnWindowFocus: false, // Prevent excessive refetching
+    },
+  },
+});
 
 function PageLoader() {
   return (
