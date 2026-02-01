@@ -102,7 +102,7 @@ export default function DashboardPage() {
             if (error) throw error;
             return data;
         },
-        enabled: !!user,
+        enabled: !!user && !authLoading,
     });
 
     // Fetch Saved Properties
@@ -122,7 +122,7 @@ export default function DashboardPage() {
             const savedIds = data.map(item => item.property_id);
             return properties.filter(p => savedIds.includes(p.id));
         },
-        enabled: !!user,
+        enabled: !!user && !authLoading,
     });
 
     // Add Requirement Mutation

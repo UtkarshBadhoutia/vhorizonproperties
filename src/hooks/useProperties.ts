@@ -33,6 +33,7 @@ export function useProperties() {
                 gallery: item.gallery || []
             })) as Property[];
         },
+        staleTime: 5 * 60 * 1000, // Consider data fresh for 5 minutes
     });
 
     const getPropertyById = (id: number) => {
