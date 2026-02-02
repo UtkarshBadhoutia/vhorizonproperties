@@ -15,6 +15,7 @@ export default function AuthCallback() {
         const handleAuthCallback = async () => {
             try {
                 console.log("[AuthCallback] Starting authentication callback processing...");
+                console.log("[AuthCallback] URL:", window.location.href);
 
                 // Check for error parameters in the URL (hash or search)
                 const params = new URLSearchParams(window.location.hash.substring(1)); // For implicit flow
@@ -22,6 +23,8 @@ export default function AuthCallback() {
 
                 const error = params.get('error') || queryParams.get('error');
                 const errorDescription = params.get('error_description') || queryParams.get('error_description');
+
+                console.log("[AuthCallback] URL params check - error:", error, "description:", errorDescription);
 
                 if (error) {
                     console.error("[AuthCallback] Auth callback error:", error, errorDescription);
@@ -31,8 +34,11 @@ export default function AuthCallback() {
                 }
 
                 // v2: getSession() handles URL parsing for both implicit and PKCE flows automatically
-                console.log("[AuthCallback] Retrieving session...");
+                console.log("[AuthCallback] Retrieving session from Supabase...");
+                const startTime = Date.now();
                 const { data: { session }, error: sessionError } = await supabase.auth.getSession();
+                const elapsed = Date.now() - startTime;
+                console.log(`[AuthCallback] Session retrieval took ${elapsed}ms`);
 
                 if (sessionError) {
                     console.error("[AuthCallback] Session retrieval error:", sessionError);
@@ -49,7 +55,8 @@ export default function AuthCallback() {
                 }
 
                 // Successful session establishment
-                console.log("[AuthCallback] Session established successfully, redirecting to dashboard");
+                console.log("[AuthCallback] Session established successfully for user:", session.user.email);
+                console.log("[AuthCallback] Redirecting to dashboard...");
                 toast.success("Signed in successfully!");
                 if (mounted) navigate("/dashboard", { replace: true });
             } catch (err) {
@@ -59,15 +66,15 @@ export default function AuthCallback() {
             }
         };
 
-        // Set a timeout to prevent infinite loading
+        // Set a timeout to prevent infinite loading (increased to 15 seconds for slower connections)
         timeoutId = setTimeout(() => {
             if (mounted) {
-                console.error("[AuthCallback] Authentication timeout reached");
+                console.error("[AuthCallback] Authentication timeout reached (15s)");
                 setTimeoutReached(true);
-                toast.error("Authentication is taking too long. Please try again.");
+                toast.error("Authentication is taking too long. Please check your connection and try again.");
                 navigate("/login", { replace: true });
             }
-        }, 5000); // 5 second timeout
+        }, 15000); // 15 second timeout
 
         handleAuthCallback();
 

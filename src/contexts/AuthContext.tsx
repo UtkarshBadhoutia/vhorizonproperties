@@ -94,17 +94,6 @@ export function AuthProvider({ children, queryClient }: AuthProviderProps) {
 
         initSession();
 
-        // Safety timeout: ensure loading state resolves even if initialization hangs
-        const safetyTimeout = setTimeout(() => {
-            if (mounted) {
-                console.warn("Auth initialization timeout - forcing loading to false");
-                // SAFETY: If we timed out, assume we are NOT authenticated to prevent showing
-                // "already signed in" state with no data.
-                setUser(null);
-                setLoading(false);
-            }
-        }, 5000);
-
         const { data: { subscription } } = supabase.auth.onAuthStateChange(
             async (event, currentSession) => {
                 if (!mounted) return;
@@ -134,7 +123,6 @@ export function AuthProvider({ children, queryClient }: AuthProviderProps) {
 
         return () => {
             mounted = false;
-            clearTimeout(safetyTimeout);
             subscription.unsubscribe();
         };
     }, []);
