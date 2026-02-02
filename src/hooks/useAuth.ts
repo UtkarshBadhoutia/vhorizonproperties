@@ -13,8 +13,12 @@ export function useRequireAuth(requireAdmin = false) {
     // Only redirect when we are done loading authentication state
     if (!loading) {
       if (!user) {
-        // Not authenticated, redirect to login
-        navigate("/login");
+        // Not authenticated
+        if (requireAdmin) {
+          navigate("/admin/login");
+        } else {
+          navigate("/login");
+        }
       } else if (requireAdmin && !isAdmin) {
         // Authenticated but not admin (if required), redirect to home
         navigate("/");

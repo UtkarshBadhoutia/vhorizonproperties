@@ -18,7 +18,8 @@ import ListingsPage from "./pages/ListingsPage";
 const PropertyDetailPage = lazy(() => import("./pages/PropertyDetailPage"));
 const TeamPage = lazy(() => import("./pages/TeamPage"));
 const ComparePage = lazy(() => import("./pages/ComparePage"));
-const LoginPage = lazy(() => import("./pages/LoginPage"));
+const UserLoginPage = lazy(() => import("./pages/UserLoginPage"));
+const AdminLoginPage = lazy(() => import("./pages/AdminLoginPage"));
 const AdminPage = lazy(() => import("./pages/AdminPage"));
 const DashboardPage = lazy(() => import("./pages/DashboardPage"));
 const StaysPage = lazy(() => import("./pages/StaysPage"));
@@ -67,7 +68,8 @@ const App = () => (
                     <Route path="/property/:id" element={<PropertyDetailPage />} />
                     <Route path="/team" element={<TeamPage />} />
                     <Route path="/compare" element={<ComparePage />} />
-                    <Route path="/login" element={<LoginPage />} />
+                    <Route path="/login" element={<UserLoginPage />} />
+                    <Route path="/admin/login" element={<AdminLoginPage />} />
                     <Route path="/auth/callback" element={<AuthCallback />} />
                     <Route path="/dashboard" element={<DashboardPage />} />
                     <Route path="/admin" element={<AdminPage />} />

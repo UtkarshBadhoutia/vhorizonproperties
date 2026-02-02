@@ -61,9 +61,11 @@ export function AuthProvider({ children, queryClient }: AuthProviderProps) {
 
 
         const initSession = async () => {
+            console.log("AuthContext: initSession started");
             try {
                 // Get the session from Supabase
                 const { data: { session: currentSession }, error } = await supabase.auth.getSession();
+                console.log("AuthContext: getSession result", { currentSession, error });
 
                 if (mounted) {
                     if (error) {
@@ -75,6 +77,7 @@ export function AuthProvider({ children, queryClient }: AuthProviderProps) {
                         setSession(currentSession);
                         setUser(currentSession?.user ?? null);
                         if (currentSession?.user) {
+                            console.log("AuthContext: Checking admin role");
                             await checkAdminRole(currentSession.user.id);
                         }
                     }
@@ -87,11 +90,13 @@ export function AuthProvider({ children, queryClient }: AuthProviderProps) {
                 }
             } finally {
                 if (mounted) {
+                    console.log("AuthContext: Setting loading to false");
                     setLoading(false);
                 }
             }
         };
 
+        console.log("AuthContext: Calling initSession");
         initSession();
 
         const { data: { subscription } } = supabase.auth.onAuthStateChange(
