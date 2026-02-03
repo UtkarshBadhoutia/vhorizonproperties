@@ -9,13 +9,13 @@ import { VitePWA } from "vite-plugin-pwa";
 export default defineConfig(({ mode }) => ({
   server: {
     host: "::",
-    port: 8081,
+    port: 8080,
   },
   plugins: [
     react(),
     mode === "development" && componentTagger(),
     sitemap({
-      hostname: "https://vhorizonproperties.in",
+      hostname: "https://vhorizonproperties.com",
       dynamicRoutes: [
         "/",
         "/buy",
