@@ -1,3 +1,11 @@
 User-agent: *
 Allow: /
+
+# Disallow admin and user-specific pages
+Disallow: /admin
+Disallow: /dashboard
+Disallow: /login
+Disallow: /auth/
+
+# Sitemap
 Sitemap: https://vhorizonproperties.in/sitemap.xml

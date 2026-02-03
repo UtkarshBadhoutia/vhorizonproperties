@@ -36,10 +36,10 @@ export default function HeroCarousel({ children }: HeroCarouselProps) {
 
   useEffect(() => {
     if (!emblaApi) return;
-    
+
     onSelect();
     emblaApi.on("select", onSelect);
-    
+
     // Auto-play every 5 seconds
     const autoplay = setInterval(() => {
       emblaApi.scrollNext();
@@ -63,7 +63,7 @@ export default function HeroCarousel({ children }: HeroCarouselProps) {
             >
               <div
                 className={cn(
-                  "absolute inset-0 bg-cover bg-center transition-transform duration-[8000ms] ease-out",
+                  "absolute inset-0 bg-cover bg-center transition-transform duration-[8s] ease-out",
                   selectedIndex === index && "scale-110"
                 )}
                 style={{ backgroundImage: `url('${image.url}')` }}

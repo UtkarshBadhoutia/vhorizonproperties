@@ -1,14 +1,19 @@
-import { Suspense, lazy } from "react";
+import { Suspense, lazy, useEffect } from "react";
 import { Toaster } from "@/components/ui/toaster";
 import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
-import { BrowserRouter, Routes, Route } from "react-router-dom";
+import { BrowserRouter, Routes, Route, useLocation } from "react-router-dom";
 import { Loader2 } from "lucide-react";
 import ScrollToTop from "@/components/ScrollToTop";
 import { AuthProvider } from "@/contexts/AuthContext";
 import { AuthGate } from "@/components/AuthGate";
 import { GlobalErrorBoundary } from "@/components/GlobalErrorBoundary";
+import ReactGA from "react-ga4";
+import { AnalyticsTracker } from "@/lib/analytics";
+import { HelmetProvider } from "react-helmet-async";
+import { CookieConsent } from "@/components/CookieConsent";
+import { SkipLink } from "@/components/SkipLink";
 
 // Eager load critical pages
 import Index from "./pages/Index";
@@ -20,11 +25,15 @@ const TeamPage = lazy(() => import("./pages/TeamPage"));
 const ComparePage = lazy(() => import("./pages/ComparePage"));
 const UserLoginPage = lazy(() => import("./pages/UserLoginPage"));
 const AdminLoginPage = lazy(() => import("./pages/AdminLoginPage"));
+const ForgotPasswordPage = lazy(() => import("./pages/ForgotPasswordPage"));
+const PasswordResetPage = lazy(() => import("./pages/PasswordResetPage"));
 const AdminPage = lazy(() => import("./pages/AdminPage"));
 const DashboardPage = lazy(() => import("./pages/DashboardPage"));
 const StaysPage = lazy(() => import("./pages/StaysPage"));
 const NotFound = lazy(() => import("./pages/NotFound"));
 const AuthCallback = lazy(() => import("./pages/AuthCallback"));
+const PrivacyPolicyPage = lazy(() => import("./pages/PrivacyPolicyPage"));
+const TermsOfServicePage = lazy(() => import("./pages/TermsOfServicePage"));
 
 const queryClient = new QueryClient({
   defaultOptions: {
@@ -40,6 +49,11 @@ const queryClient = new QueryClient({
   },
 });
 
+// Initialize Google Analytics
+if (import.meta.env.VITE_GA_MEASUREMENT_ID) {
+  ReactGA.initialize(import.meta.env.VITE_GA_MEASUREMENT_ID);
+}
+
 function PageLoader() {
   return (
     <div className="min-h-screen flex items-center justify-center">
@@ -49,40 +63,49 @@ function PageLoader() {
 }
 
 const App = () => (
-  <QueryClientProvider client={queryClient}>
-    <TooltipProvider>
-      <AuthProvider queryClient={queryClient}>
-        <GlobalErrorBoundary>
+  <HelmetProvider>
+    <QueryClientProvider client={queryClient}>
+      <TooltipProvider>
+        <AuthProvider queryClient={queryClient}>
           <GlobalErrorBoundary>
-            <Toaster />
-            <Sonner />
-            <BrowserRouter>
-              <AuthGate>
-                <ScrollToTop />
-                <Suspense fallback={<PageLoader />}>
-                  <Routes>
-                    <Route path="/" element={<Index />} />
-                    <Route path="/buy" element={<ListingsPage key="buy" defaultStatus="sale" />} />
-                    <Route path="/rent" element={<ListingsPage key="rent" defaultStatus="rent" />} />
-                    <Route path="/stays" element={<StaysPage />} />
-                    <Route path="/property/:id" element={<PropertyDetailPage />} />
-                    <Route path="/team" element={<TeamPage />} />
-                    <Route path="/compare" element={<ComparePage />} />
-                    <Route path="/login" element={<UserLoginPage />} />
-                    <Route path="/admin/login" element={<AdminLoginPage />} />
-                    <Route path="/auth/callback" element={<AuthCallback />} />
-                    <Route path="/dashboard" element={<DashboardPage />} />
-                    <Route path="/admin" element={<AdminPage />} />
-                    <Route path="*" element={<NotFound />} />
-                  </Routes>
-                </Suspense>
-              </AuthGate>
-            </BrowserRouter>
+            <GlobalErrorBoundary>
+              <Toaster />
+              <Sonner />
+              <BrowserRouter>
+                <SkipLink />
+                <AnalyticsTracker />
+                <AuthGate>
+                  <ScrollToTop />
+                  <Suspense fallback={<PageLoader />}>
+                    <Routes>
+                      <Route path="/" element={<Index />} />
+                      <Route path="/buy" element={<ListingsPage key="buy" defaultStatus="sale" />} />
+                      <Route path="/rent" element={<ListingsPage key="rent" defaultStatus="rent" />} />
+                      <Route path="/stays" element={<StaysPage />} />
+                      <Route path="/property/:id" element={<PropertyDetailPage />} />
+                      <Route path="/team" element={<TeamPage />} />
+                      <Route path="/compare" element={<ComparePage />} />
+                      <Route path="/login" element={<UserLoginPage />} />
+                      <Route path="/admin/login" element={<AdminLoginPage />} />
+                      <Route path="/forgot-password" element={<ForgotPasswordPage />} />
+                      <Route path="/reset-password" element={<PasswordResetPage />} />
+                      <Route path="/auth/callback" element={<AuthCallback />} />
+                      <Route path="/dashboard" element={<DashboardPage />} />
+                      <Route path="/admin" element={<AdminPage />} />
+                      <Route path="/privacy-policy" element={<PrivacyPolicyPage />} />
+                      <Route path="/terms-of-service" element={<TermsOfServicePage />} />
+                      <Route path="*" element={<NotFound />} />
+                    </Routes>
+                  </Suspense>
+                </AuthGate>
+                <CookieConsent />
+              </BrowserRouter>
+            </GlobalErrorBoundary>
           </GlobalErrorBoundary>
-        </GlobalErrorBoundary>
-      </AuthProvider>
-    </TooltipProvider>
-  </QueryClientProvider>
+        </AuthProvider>
+      </TooltipProvider>
+    </QueryClientProvider>
+  </HelmetProvider>
 );
 
 export default App;

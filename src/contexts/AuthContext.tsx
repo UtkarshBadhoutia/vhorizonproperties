@@ -2,6 +2,7 @@ import { createContext, useContext, useEffect, useState } from "react";
 import { User, Session } from "@supabase/supabase-js";
 import { supabase } from "@/integrations/supabase/client";
 import { QueryClient } from "@tanstack/react-query";
+import { debugLog } from "@/lib/debug";
 
 interface AuthContextType {
     user: User | null;
@@ -48,55 +49,69 @@ export function AuthProvider({ children, queryClient }: AuthProviderProps) {
                 if (!mounted) return;
 
                 if (error) {
-                    console.error("Error checking admin role:", error);
+                    debugLog.authError("Error checking admin role", error);
                     setIsAdmin(false);
                 } else {
                     setIsAdmin(!!data);
                 }
             } catch (err) {
-                console.error("Error checking admin role:", err);
+                debugLog.authError("Error checking admin role", err);
                 if (mounted) setIsAdmin(false);
             }
         };
 
 
         const initSession = async () => {
-            console.log("AuthContext: initSession started");
-            try {
-                // Get the session from Supabase
-                const { data: { session: currentSession }, error } = await supabase.auth.getSession();
-                console.log("AuthContext: getSession result", { currentSession, error });
+            debugLog.auth("initSession started");
+            debugLog.auth("Supabase URL:", import.meta.env.VITE_SUPABASE_URL);
+            debugLog.auth("Supabase Key present:", !!import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY);
+
+            try {    // Add timeout to prevent infinite loading if Supabase hangs
+                // Increased to 10 seconds to account for slow connections
+                const timeoutPromise = new Promise((_, reject) =>
+                    setTimeout(() => reject(new Error('Supabase getSession timeout after 10s')), 10000)
+                );
+
+                const sessionPromise = supabase.auth.getSession();
+
+                // Race between the actual call and timeout
+                const { data: { session: currentSession }, error } = await Promise.race([
+                    sessionPromise,
+                    timeoutPromise
+                ]) as Awaited<ReturnType<typeof supabase.auth.getSession>>;
+
+                debugLog.auth("getSession result", { currentSession, error });
 
                 if (mounted) {
                     if (error) {
                         // If error (invalid token, etc.), assume logged out
-                        console.error("Session verification failed:", error);
+                        debugLog.authError("Session verification failed", error);
                         setSession(null);
                         setUser(null);
                     } else {
                         setSession(currentSession);
                         setUser(currentSession?.user ?? null);
                         if (currentSession?.user) {
-                            console.log("AuthContext: Checking admin role");
+                            debugLog.auth("Checking admin role");
                             await checkAdminRole(currentSession.user.id);
                         }
                     }
                 }
             } catch (err) {
-                console.error("Session init error:", err);
+                debugLog.authError("Session init error", err);
                 if (mounted) {
                     setSession(null);
                     setUser(null);
                 }
             } finally {
                 if (mounted) {
-                    console.log("AuthContext: Setting loading to false");
+                    debugLog.auth("Setting loading to false");
                     setLoading(false);
                 }
             }
         };
 
-        console.log("AuthContext: Calling initSession");
+        debugLog.auth("Calling initSession");
         initSession();
 
         const { data: { subscription } } = supabase.auth.onAuthStateChange(
@@ -130,13 +145,13 @@ export function AuthProvider({ children, queryClient }: AuthProviderProps) {
             mounted = false;
             subscription.unsubscribe();
         };
-    }, []);
+    }, [queryClient]);
 
     const signOut = async () => {
         try {
             await supabase.auth.signOut();
         } catch (error) {
-            console.error("Error signing out:", error);
+            debugLog.authError("Error signing out", error);
         } finally {
             setUser(null);
             setIsAdmin(false);

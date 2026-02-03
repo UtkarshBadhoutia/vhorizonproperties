@@ -23,4 +23,10 @@ export default tseslint.config(
       "@typescript-eslint/no-unused-vars": "off",
     },
   },
+  {
+    files: ['vitest.config.ts'],
+    rules: {
+      '@typescript-eslint/no-explicit-any': 'off', // Type conflict between vite versions
+    },
+  },
 );

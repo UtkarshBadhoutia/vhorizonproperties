@@ -8,6 +8,8 @@ import { Label } from "@/components/ui/label";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
+import { rateLimiter, RateLimitConfigs } from "@/lib/rateLimit";
+import { sanitizeEmail } from "@/lib/sanitize";
 
 export default function UserLoginPage() {
     const navigate = useNavigate();
@@ -27,24 +29,40 @@ export default function UserLoginPage() {
 
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
+
+        // Rate limiting check
+        const rateLimitKey = `login:${email.toLowerCase()}`;
+        if (!rateLimiter.check(rateLimitKey, RateLimitConfigs.login)) {
+            const resetTime = rateLimiter.getResetTime(rateLimitKey);
+            toast.error(`Too many login attempts. Please try again in ${Math.ceil(resetTime / 60)} minutes.`);
+            return;
+        }
+
         setLoading(true);
 
         try {
+            // Sanitize email
+            const sanitizedEmail = sanitizeEmail(email);
+
             if (activeTab === "signup") {
                 const { error } = await supabase.auth.signUp({
-                    email,
+                    email: sanitizedEmail,
                     password,
                 });
                 if (error) throw error;
                 toast.success("Account created! You can now sign in.");
                 setActiveTab("signin");
+                // Clear rate limit on successful signup
+                rateLimiter.clear(rateLimitKey);
             } else {
                 const { error } = await supabase.auth.signInWithPassword({
-                    email,
+                    email: sanitizedEmail,
                     password,
                 });
                 if (error) throw error;
                 toast.success("Welcome back!");
+                // Clear rate limit on successful login
+                rateLimiter.clear(rateLimitKey);
                 // Navigation handled by useEffect
             }
         } catch (err: unknown) {
@@ -134,9 +152,9 @@ export default function UserLoginPage() {
                                     <div className="flex items-center justify-between">
                                         <Label htmlFor="password">Password</Label>
                                         {activeTab === "signin" && (
-                                            <button type="button" className="text-xs text-primary hover:underline font-medium">
+                                            <Link to="/forgot-password" className="text-xs text-primary hover:underline font-medium">
                                                 Forgot password?
-                                            </button>
+                                            </Link>
                                         )}
                                     </div>
                                     <div className="relative">
