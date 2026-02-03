@@ -44,6 +44,7 @@ export default function AuthCallback() {
                 if (error) {
                     debugLog.authError("Auth callback error", { error, errorDescription });
                     toast.error(`Authentication failed: ${errorDescription || error}`);
+                    window._auth_processing = false;
                     if (mounted) navigate("/login", { replace: true });
                     return;
                 }
@@ -95,6 +96,7 @@ export default function AuthCallback() {
                 if (sessionError) {
                     debugLog.authError("Session exchange/retrieval error", sessionError);
                     toast.error(`Auth Error: ${sessionError.message}`);
+                    window._auth_processing = false;
                     if (mounted) navigate("/login", { replace: true });
                     return;
                 }
@@ -104,6 +106,7 @@ export default function AuthCallback() {
                 if (!session) {
                     debugLog.warn("No session found after callback");
                     toast.error("No session established. Please sign in again.");
+                    window._auth_processing = false;
                     if (mounted) navigate("/login", { replace: true });
                     return;
                 }
@@ -116,10 +119,12 @@ export default function AuthCallback() {
                 if (timeoutRef.current) clearTimeout(timeoutRef.current);
 
                 toast.success("Signed in successfully!");
+                window._auth_processing = false;
                 if (mounted) navigate("/dashboard", { replace: true });
             } catch (err) {
                 debugLog.authError("Unexpected error handling auth callback", err);
                 toast.error("An unexpected error occurred. Please try again.");
+                window._auth_processing = false;
                 if (mounted) navigate("/login", { replace: true });
             }
         };
@@ -130,6 +135,7 @@ export default function AuthCallback() {
                 debugLog.authError("Authentication timeout reached (15s)");
                 setTimeoutReached(true);
                 toast.error("Authentication is taking too long. Please check your connection and try again.");
+                window._auth_processing = false;
                 navigate("/login", { replace: true });
             }
         }, 15000); // 15 second timeout

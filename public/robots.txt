@@ -8,4 +8,4 @@ Disallow: /login
 Disallow: /auth/
 
 # Sitemap
-Sitemap: https://vhorizonproperties.in/sitemap.xml
+Sitemap: https://vhorizonproperties.com/sitemap.xml
